@@ -17,9 +17,10 @@ function App() {
   const [description, setDescription] = useState('')
   const [deadline, setDeadline] = useState('')
   const [editingId, setEditingId] = useState<string | null>(null)
-  const [editingField, setEditingField] = useState<'title' | 'description' | null>(null)
+  const [editingField, setEditingField] = useState<'title' | 'description' | 'deadline' | null>(null)
   const [editingTitle, setEditingTitle] = useState('')
   const [editingDescription, setEditingDescription] = useState('')
+  const [editingDeadline, setEditingDeadline] = useState('')
   const [completedCollapsed, setCompletedCollapsed] = useState(true) 
   const isInitialized = useRef(false) // 标记是否已初始化完成
 
@@ -29,7 +30,9 @@ function App() {
     if (savedTodos) {
       try {
         const parsedTodos = JSON.parse(savedTodos)
-        setTodos(parsedTodos)
+        if (Array.isArray(parsedTodos)) {
+          setTodos(parsedTodos)
+        }
       } catch (error) {
         console.error('加载数据失败:', error)
       }
@@ -39,8 +42,10 @@ function App() {
     if (savedCollapsed !== null) {
       setCompletedCollapsed(savedCollapsed === 'true')
     }
-    // 标记初始化完成
-    isInitialized.current = true
+    // 使用 setTimeout 确保 setTodos 的状态更新完成后再标记初始化完成
+    setTimeout(() => {
+      isInitialized.current = true
+    }, 100)
   }, [])
 
   // 保存数据到 localStorage（跳过初始化阶段）
@@ -75,6 +80,15 @@ function App() {
 
   // 开始编辑标题
   const handleStartEditTitle = (todo: Todo) => {
+    if (editingId && editingId !== todo.id) {
+      if (editingField === 'title') {
+        handleSaveTitle(editingId)
+      } else if (editingField === 'description') {
+        handleSaveDescription(editingId)
+      } else if (editingField === 'deadline') {
+        handleSaveDeadline(editingId)
+      }
+    }
     setEditingId(todo.id)
     setEditingField('title')
     setEditingTitle(todo.title)
@@ -87,11 +101,29 @@ function App() {
         handleSaveTitle(editingId)
       } else if (editingField === 'description') {
         handleSaveDescription(editingId)
+      } else if (editingField === 'deadline') {
+        handleSaveDeadline(editingId)
       }
     }
     setEditingId(todo.id)
     setEditingField('description')
     setEditingDescription(todo.description || '')
+  }
+
+  // 开始编辑日期
+  const handleStartEditDeadline = (todo: Todo) => {
+    if (editingId && editingId !== todo.id) {
+      if (editingField === 'title') {
+        handleSaveTitle(editingId)
+      } else if (editingField === 'description') {
+        handleSaveDescription(editingId)
+      } else if (editingField === 'deadline') {
+        handleSaveDeadline(editingId)
+      }
+    }
+    setEditingId(todo.id)
+    setEditingField('deadline')
+    setEditingDeadline(todo.deadline || '')
   }
 
   // 保存标题
@@ -118,12 +150,25 @@ function App() {
     setEditingDescription('')
   }
 
+  // 保存日期
+  const handleSaveDeadline = (id: string) => {
+    setTodos(todos.map(todo =>
+      todo.id === id
+        ? { ...todo, deadline: editingDeadline || undefined }
+        : todo
+    ))
+    setEditingId(null)
+    setEditingField(null)
+    setEditingDeadline('')
+  }
+
   // 取消编辑
   const handleCancelEdit = () => {
     setEditingId(null)
     setEditingField(null)
     setEditingTitle('')
     setEditingDescription('')
+    setEditingDeadline('')
   }
 
   // 删除待办事项
@@ -308,9 +353,55 @@ function App() {
           )}
 
           {/* 截止日期显示 */}
-          {todo.deadline && (
-            <div className={`todo-deadline ${isOverdue(todo.deadline) ? 'overdue' : ''} ${formatDeadline(todo.deadline).isUrgent ? 'urgent' : ''}`}>
+          {editingId === todo.id && editingField === 'deadline' ? (
+            <input
+              type="date"
+              value={editingDeadline}
+              onChange={(e) => setEditingDeadline(e.target.value)}
+              onBlur={() => handleSaveDeadline(todo.id)}
+              onKeyDown={(e) => {
+                if (e.key === 'Escape') {
+                  handleCancelEdit()
+                }
+              }}
+              className="todo-edit-date"
+              autoFocus
+            />
+          ) : todo.deadline ? (
+            <div
+              className={`todo-deadline ${isOverdue(todo.deadline) ? 'overdue' : ''} ${formatDeadline(todo.deadline).isUrgent ? 'urgent' : ''}`}
+              onClick={(e) => {
+                e.stopPropagation()
+                if (!todo.completed && (editingId !== todo.id || editingField !== 'deadline')) {
+                  handleStartEditDeadline(todo)
+                }
+              }}
+              style={{
+                cursor: todo.completed ? 'default' : 'pointer',
+                pointerEvents: 'auto',
+                display: 'inline-block',
+                marginTop: '8px'
+              }}
+            >
               {formatDeadline(todo.deadline).text}
+            </div>
+          ) : (
+            <div
+              className="todo-deadline-placeholder"
+              onClick={(e) => {
+                e.stopPropagation()
+                if (!todo.completed && (editingId !== todo.id || editingField !== 'deadline')) {
+                  handleStartEditDeadline(todo)
+                }
+              }}
+              style={{
+                cursor: todo.completed ? 'default' : 'pointer',
+                pointerEvents: 'auto',
+                display: 'inline-block',
+                marginTop: '8px'
+              }}
+            >
+              点击添加日期...
             </div>
           )}
         </div>

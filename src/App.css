@@ -368,6 +368,60 @@ h1 {
   font-weight: 600;
 }
 
+.todo-deadline:hover {
+  background: #EBE8E4;
+}
+
+.todo-deadline-placeholder {
+  font-size: 12px;
+  color: #B8B8B8;
+  font-style: italic;
+  margin-top: 8px;
+  padding: 4px 10px;
+  border-radius: 12px;
+  display: inline-block;
+  background: #F0F0F0;
+  transition: background 0.2s;
+}
+
+.todo-deadline-placeholder:hover {
+  background: #EBE8E4;
+}
+
+.todo-edit-date {
+  margin-top: 8px;
+  padding: 6px 10px;
+  border: 2px solid #A8B8C8;
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: inherit;
+  background: #FFFFFF;
+  color: #5C5C5C;
+  cursor: pointer;
+  outline: none;
+  font-weight: 500;
+  min-height: 36px;
+}
+
+.todo-edit-date:focus {
+  border-color: #8B9DC3;
+}
+
+.todo-edit-date::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  opacity: 0.7;
+  width: 18px;
+  height: 18px;
+  padding: 3px;
+  margin-left: 6px;
+}
+
+.todo-edit-date::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
+  background-color: #F5F3F0;
+  border-radius: 3px;
+}
+
 .todo-edit-input {
   width: 100%;
   padding: 4px 8px;
