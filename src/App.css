@@ -4,12 +4,31 @@
 }
 
 .container {
-  max-width: 600px;
+  max-width: 1200px;
   margin: 0 auto;
   background: #FAF8F5;
   border-radius: 12px;
   padding: 30px;
   box-shadow: 0 4px 20px rgba(139, 157, 195, 0.15);
+}
+
+/* 主布局：左右分栏 */
+.main-layout {
+  display: flex;
+  gap: 30px;
+  align-items: flex-start;
+}
+
+/* 左侧：待办列表区域 */
+.todo-section {
+  flex: 1;
+  min-width: 0; /* 允许flex子元素收缩 */
+}
+
+/* 右侧：表单区域 */
+.form-section {
+  width: 350px;
+  flex-shrink: 0;
 }
 
 h1 {
@@ -22,9 +41,21 @@ h1 {
 
 /* 添加表单 */
 .add-form {
-  margin-bottom: 30px;
-  padding-bottom: 20px;
-  border-bottom: 2px solid #E5E1DB;
+  background: #FFFFFF;
+  padding: 24px;
+  border-radius: 8px;
+  border: 1px solid #E5E1DB;
+  box-shadow: 0 2px 8px rgba(139, 157, 195, 0.1);
+  position: sticky;
+  top: 20px; /* 滚动时固定在顶部 */
+}
+
+.form-section-title {
+  font-size: 18px;
+  font-weight: 500;
+  color: #6B6B6B;
+  margin-bottom: 20px;
+  margin-top: 0;
 }
 
 .form-group {
@@ -58,6 +89,45 @@ h1 {
   background: #FFFFFF;
 }
 
+.form-group input[type="date"] {
+  cursor: pointer;
+  color-scheme: light;
+  font-size: 16px;
+  padding: 12px 14px;
+  min-height: 48px;
+  font-weight: 500;
+}
+
+.form-group input[type="date"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  opacity: 0.7;
+  width: 20px;
+  height: 20px;
+  padding: 4px;
+  margin-left: 8px;
+  background-size: 20px 20px;
+}
+
+.form-group input[type="date"]::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
+  background-color: #F5F3F0;
+  border-radius: 4px;
+}
+
+/* Firefox 日期选择器样式 */
+.form-group input[type="date"]::-moz-calendar-picker-indicator {
+  cursor: pointer;
+  opacity: 0.7;
+  width: 20px;
+  height: 20px;
+  padding: 4px;
+  margin-left: 8px;
+}
+
+.form-group input[type="date"]::-moz-calendar-picker-indicator:hover {
+  opacity: 1;
+}
+
 .add-btn {
   width: 100%;
   padding: 12px;
@@ -79,17 +149,102 @@ h1 {
   transform: scale(0.98);
 }
 
+/* 统计信息 */
+.todo-stats {
+  margin-bottom: 20px;
+  padding: 12px 16px;
+  background: #F5F3F0;
+  border-radius: 8px;
+  text-align: center;
+  color: #8B8B8B;
+  font-size: 14px;
+  border: 1px solid #E5E1DB;
+  font-weight: 500;
+}
+
 /* 待办事项列表 */
 .todo-list {
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 20px;
+}
+
+/* 分组容器 */
+.todo-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* 分组标题 */
+.todo-group-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: #F5F3F0;
+  border-radius: 8px;
+  border: 1px solid #E5E1DB;
+  transition: all 0.2s;
+}
+
+.todo-group-header.clickable {
+  cursor: pointer;
+}
+
+.todo-group-header.clickable:hover {
+  background: #EBE8E4;
+  border-color: #D5D1CB;
+}
+
+.todo-group-title {
+  font-size: 16px;
+  font-weight: 500;
+  color: #6B6B6B;
+  margin: 0;
+}
+
+.todo-group-header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.todo-group-count {
+  font-size: 14px;
+  color: #8B8B8B;
+  background: #FFFFFF;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-weight: 500;
+}
+
+.collapse-icon {
+  font-size: 12px;
+  color: #8B8B8B;
+  transition: transform 0.3s ease;
+  display: inline-block;
+}
+
+.collapse-icon.collapsed {
+  transform: rotate(-90deg);
+}
+
+/* 分组内容 */
+.todo-group-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-left: 4px;
 }
 
 .empty-state {
   text-align: center;
-  padding: 40px 20px;
+  padding: 60px 20px;
   color: #B8B8B8;
+  background: #F5F3F0;
+  border-radius: 8px;
+  border: 1px dashed #E5E1DB;
 }
 
 .todo-item {
@@ -110,6 +265,11 @@ h1 {
 
 .todo-item.completed {
   opacity: 0.7;
+}
+
+.todo-item.overdue-item {
+  border-left: 3px solid #C9A8A8;
+  background: #F8F3F3;
 }
 
 .todo-content {
@@ -185,6 +345,29 @@ h1 {
   background: #EBE8E4;
 }
 
+/* 截止日期显示 */
+.todo-deadline {
+  font-size: 12px;
+  color: #8B8B8B;
+  margin-top: 8px;
+  padding: 4px 10px;
+  border-radius: 12px;
+  display: inline-block;
+  background: #F0F0F0;
+  font-weight: 500;
+}
+
+.todo-deadline.urgent {
+  background: #F5E6D3;
+  color: #B88A5C;
+}
+
+.todo-deadline.overdue {
+  background: #F5E0E0;
+  color: #C9A8A8;
+  font-weight: 600;
+}
+
 .todo-edit-input {
   width: 100%;
   padding: 4px 8px;
@@ -232,6 +415,21 @@ h1 {
   transform: scale(0.95);
 }
 
+/* 响应式设计 */
+@media (max-width: 900px) {
+  .main-layout {
+    flex-direction: column;
+  }
+
+  .form-section {
+    width: 100%;
+  }
+
+  .add-form {
+    position: static; /* 小屏幕时取消固定定位 */
+  }
+}
+
 @media (max-width: 600px) {
   .container {
     padding: 20px;
@@ -239,6 +437,10 @@ h1 {
 
   h1 {
     font-size: 24px;
+  }
+
+  .main-layout {
+    gap: 20px;
   }
 }
 
